@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Assets\Icons\DefaultCloud.svg" />
+    <None Remove="Assets\Icons\GoogleDrive_Icon.svg" />
+    <None Remove="Assets\Icons\OneDrive_Icon.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.19" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.19" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.19" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.18" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.60.0.3024" />
+    <PackageReference Include="Microsoft.Graph" Version="5.7.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.53.0" />
+    <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Icons\DefaultCloud.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\GoogleDrive_Icon.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\OneDrive_Icon.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CloudMigrationTool.Core\CloudMigrationTool.Core.csproj" />
+  </ItemGroup>
+</Project>
