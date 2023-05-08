@@ -6,11 +6,6 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Assets\Icons\DefaultCloud.svg" />
-    <None Remove="Assets\Icons\GoogleDrive_Icon.svg" />
-    <None Remove="Assets\Icons\OneDrive_Icon.svg" />
-  </ItemGroup>
 
   <ItemGroup>
     <TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
@@ -38,6 +33,15 @@
     <Content Include="Assets\Icons\OneDrive_Icon.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+	<Content Update="Assets\Icons\CloudDownload.svg">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Update="Assets\Icons\CloudSynchronization.svg">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Update="Assets\Icons\CloudUpload.svg">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
   <ItemGroup>

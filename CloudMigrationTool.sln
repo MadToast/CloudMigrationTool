@@ -5,13 +5,15 @@ VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudMigrationTool", "CloudMigrationTool.csproj", "{1800A750-4F57-4614-B449-F720909A581F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudMigrationTool.Core", "..\CloudMigrationTool.Core\CloudMigrationTool.Core.csproj", "{16DCFC81-3505-4DA6-8821-690FCCB9505D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudMigrationTool.Core", "..\CloudMigrationTool.Core\CloudMigrationTool.Core.csproj", "{16DCFC81-3505-4DA6-8821-690FCCB9505D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CloudSources", "CloudSources", "{61D1C65D-5B18-4AD0-9B57-5D1A767CE740}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudMigrationSource.OneDrive", "..\CloudMigrationSource.OneDrive\CloudMigrationSource.OneDrive.csproj", "{4C5DFC76-9DA9-42DF-8132-1B2A03C6123E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudMigrationSource.OneDrive", "..\CloudMigrationSource.OneDrive\CloudMigrationSource.OneDrive.csproj", "{4C5DFC76-9DA9-42DF-8132-1B2A03C6123E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudMigrationSource.GDrive", "..\CloudMigrationSource.GDrive\CloudMigrationSource.GDrive.csproj", "{EFCD229A-E1C4-471D-9207-C061A4F489B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudMigrationSource.GDrive", "..\CloudMigrationSource.GDrive\CloudMigrationSource.GDrive.csproj", "{EFCD229A-E1C4-471D-9207-C061A4F489B6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core Projects", "Core Projects", "{B8911CCC-4743-4FA7-AB77-92324299A49B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +42,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{16DCFC81-3505-4DA6-8821-690FCCB9505D} = {B8911CCC-4743-4FA7-AB77-92324299A49B}
 		{4C5DFC76-9DA9-42DF-8132-1B2A03C6123E} = {61D1C65D-5B18-4AD0-9B57-5D1A767CE740}
 		{EFCD229A-E1C4-471D-9207-C061A4F489B6} = {61D1C65D-5B18-4AD0-9B57-5D1A767CE740}
 	EndGlobalSection

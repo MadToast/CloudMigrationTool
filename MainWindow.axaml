@@ -3,9 +3,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="950" d:DesignHeight="450"
         x:Class="CloudMigrationTool.MainWindow"
         Title="CloudMigrationTool"
+		MinHeight="450"
+		MinWidth="800"
 		TransparencyLevelHint="AcrylicBlur"
 		Background="Transparent"
 		ExtendClientAreaToDecorationsHint="True">
@@ -52,20 +54,62 @@
 				</DrawingGroup>
 			</DrawingImage.Drawing>
 		</DrawingImage>
+		<DrawingImage x:Key="FileIcon">
+			<DrawingImage.Drawing>
+				<DrawingGroup ClipGeometry="M0,0 V48 H48 V0 H0 Z">
+					<GeometryDrawing Brush="LightGray" Geometry="F1 M48,48z M0,0z M12.5,4C10.032499,4,8,6.0324991,8,8.5L8,39.5C8,41.967501,10.032499,44,12.5,44L35.5,44C37.967501,44,40,41.967501,40,39.5L40,18.5A1.50015,1.50015,0,0,0,39.560547,17.439453L39.544922,17.423828 26.560547,4.4394531A1.50015,1.50015,0,0,0,25.5,4L12.5,4z M12.5,7L24,7 24,15.5C24,17.967501,26.032499,20,28.5,20L37,20 37,39.5C37,40.346499,36.346499,41,35.5,41L12.5,41C11.653501,41,11,40.346499,11,39.5L11,8.5C11,7.6535009,11.653501,7,12.5,7z M27,9.1210938L34.878906,17 28.5,17C27.653501,17,27,16.346499,27,15.5L27,9.1210938z" />
+				</DrawingGroup>
+			</DrawingImage.Drawing>
+		</DrawingImage>
+		<DrawingImage x:Key="FolderIcon">
+			<DrawingImage.Drawing>
+				<DrawingGroup ClipGeometry="M0,0 V48 H48 V0 H0 Z">
+					<GeometryDrawing Brush="LightGray" Geometry="F1 M48,48z M0,0z M8.5,8C6.0324991,8,4,10.032499,4,12.5L4,35.5C4,37.967501,6.0324991,40,8.5,40L39.5,40C41.967501,40,44,37.967501,44,35.5L44,17.5C44,15.032499,41.967501,13,39.5,13L24.042969,13 19.572266,9.2753906C18.584055,8.4521105,17.339162,8,16.052734,8L8.5,8z M8.5,11L16.052734,11C16.638307,11,17.202555,11.205358,17.652344,11.580078L21.15625,14.5 17.652344,17.419922C17.202555,17.794642,16.638307,18,16.052734,18L7,18 7,12.5C7,11.653501,7.6535009,11,8.5,11z M24.042969,16L39.5,16C40.346499,16,41,16.653501,41,17.5L41,35.5C41,36.346499,40.346499,37,39.5,37L8.5,37C7.6535009,37,7,36.346499,7,35.5L7,21 16.052734,21C17.339162,21,18.584055,20.547889,19.572266,19.724609L24.042969,16z" />
+				</DrawingGroup>
+			</DrawingImage.Drawing>
+		</DrawingImage>
+		<DrawingImage x:Key="RefreshIcon">
+			<DrawingImage.Drawing>
+				<DrawingGroup ClipGeometry="M0,0 V32 H32 V0 H0 Z">
+					<GeometryDrawing Brush="LightGray" Geometry="F1 M32,32z M0,0z M16,4C10.886719,4,6.617188,7.160156,4.875,11.625L6.71875,12.375C8.175781,8.640625 11.710938,6 16,6 19.242188,6 22.132813,7.589844 23.9375,10L20,10 20,12 27,12 27,5 25,5 25,8.09375C22.808594,5.582031,19.570313,4,16,4z M25.28125,19.625C23.824219,23.359375 20.289063,26 16,26 12.722656,26 9.84375,24.386719 8.03125,22L12,22 12,20 5,20 5,27 7,27 7,23.90625C9.1875,26.386719 12.394531,28 16,28 21.113281,28 25.382813,24.839844 27.125,20.375z" />
+				</DrawingGroup>
+			</DrawingImage.Drawing>
+		</DrawingImage>
+		<DrawingImage x:Key="ArrowRight">
+			<DrawingImage.Drawing>
+				<DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
+					<DrawingGroup Opacity="1">
+						<DrawingGroup Opacity="1">
+							<GeometryDrawing Brush="LightGray" Geometry="F1 M24,24z M0,0z M14.2097679,6.38701891L14.2929663,6.29282017C14.6534875,5.93237345,15.2207214,5.90470252,15.6129811,6.20976794L15.7071798,6.29296628 20.7037925,11.2906115C21.0640388,11.6509322,21.0919064,12.2177853,20.7872848,12.6100581L20.7042025,12.7042687 15.7075898,17.7077144C15.3173324,18.0985054 14.6841676,18.0989381 14.2933765,17.7086807 13.9326464,17.3484432 13.9045292,16.7812312 14.209286,16.3887317L14.2924102,16.2944675 17.5809963,13 3.99999627,13C3.48716044,13,3.06448911,12.6139598,3.00672401,12.1166211L2.99999627,12C2.99999627,11.4871642,3.38603647,11.0644928,3.88337515,11.0067277L3.99999627,11 17.5839963,11 14.2928202,7.70703372C13.9323735,7.34651252,13.9047025,6.7792786,14.2097679,6.38701891L14.2929663,6.29282017 14.2097679,6.38701891z" />
+						</DrawingGroup>
+					</DrawingGroup>
+				</DrawingGroup>
+			</DrawingImage.Drawing>
+		</DrawingImage>
 	</Window.Resources>
+	<Window.Styles>
+		<Style Selector="Label.wrap > TextBlock">
+			<Setter Property="TextWrapping" Value="Wrap" />
+		</Style>
+	</Window.Styles>
 	<Panel>
 		<ExperimentalAcrylicBorder IsHitTestVisible="False">
 			<ExperimentalAcrylicBorder.Material>
 				<ExperimentalAcrylicMaterial
 					BackgroundSource="Digger"
 					TintColor="Black"
-					TintOpacity="1"
-					MaterialOpacity="0.65" />
+					TintOpacity="0.8"
+					MaterialOpacity="0.8" />
 			</ExperimentalAcrylicBorder.Material>
 		</ExperimentalAcrylicBorder>
-		<Panel>
-			<Grid ColumnDefinitions="50*,50*" RowDefinitions="100*">
-				<Panel Margin="40,40,20,40">
+		<Panel Margin="20,30,20,0">
+			<Grid ColumnDefinitions="50*,50*" RowDefinitions="60, 80*, 150">
+				<Label Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0"
+					Content="Cloud Migration Helper"
+					HorizontalContentAlignment="Left"
+					FontWeight="Bold"
+					FontSize="30"/>
+				<Panel Margin="0,0,10,0" Grid.Column="0" Grid.Row="1">
 					<ExperimentalAcrylicBorder IsHitTestVisible="False">
 						<ExperimentalAcrylicBorder.Material>
 							<ExperimentalAcrylicMaterial
@@ -77,24 +121,35 @@
 					</ExperimentalAcrylicBorder>
 					<StackPanel VerticalAlignment="Center" 
 								Name="SourceCloudProviderPanel" 
-								Grid.Column="0" 
+								Grid.Column="0"
 								Grid.Row="0"
-								IsVisible="{">
+								IsVisible="{Binding !SourceCloudChosen}"
+								ClipToBounds="True">
 						<Image Width="90" Margin="40" Source="{StaticResource CloudUpload}" />
-						<Label Content="[CLOUD PROVIDER NAME]"
+						<Label Content="Source Cloud Provider"
 							   HorizontalContentAlignment="Center"
 							   FontWeight="SemiBold"
 							   FontSize="20"/>
-						<Label Content="Logged in as:"
-							   HorizontalContentAlignment="Center"/>
-						<Label Content="[text@example.com]"
-							   HorizontalContentAlignment="Center"/>
-						<Button Margin="20" HorizontalAlignment="Center" Content="Change Source Cloud Provider" />
+						<ListBox Margin="20"
+								 Height="100">
+							<ListBoxItem Content="Teste 1"></ListBoxItem>
+						</ListBox>
+						<Button Margin="20,0,20,20"
+								HorizontalAlignment="Center">
+							<Button.Content>
+								<StackPanel Orientation="Horizontal">
+									<Label Content="Select Cloud Provider" />
+									<Image Width="20" Source="{StaticResource ArrowRight}" />
+								</StackPanel>
+							</Button.Content>
+						</Button>
 					</StackPanel>
 					<StackPanel VerticalAlignment="Center"
 								Name="SourceCloudProviderPrompt"
 								Grid.Column="0"
-								Grid.Row="0">
+								Grid.Row="0"
+								IsVisible="{Binding SourceCloudChosen}"
+								ClipToBounds="True">
 						<Image Width="90" Margin="40" Source="{StaticResource CloudUpload}" />
 						<Label Content="[CLOUD PROVIDER NAME]"
 							   HorizontalContentAlignment="Center"
@@ -104,22 +159,149 @@
 							   HorizontalContentAlignment="Center"/>
 						<Label Content="[text@example.com]"
 							   HorizontalContentAlignment="Center"/>
-						<Button Margin="20" HorizontalAlignment="Center" Content="Change Source Cloud Provider" />
+						<Button Margin="20"
+								HorizontalAlignment="Center">
+							<Button.Content>
+								<StackPanel Orientation="Horizontal">
+									<Image Width="20" Source="{StaticResource RefreshIcon}" />
+									<Label Content="Change Cloud Provider" />
+								</StackPanel>
+							</Button.Content>
+						</Button>
 					</StackPanel>
 				</Panel>
-				<StackPanel Background="Blue" Name="DestinationCloudProviderPanel" VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="10,20,20,20">
-					<Image Width="90" Margin="40" Source="{StaticResource DefaultCloud}" />
-					<Label Content="[CLOUD PROVIDER NAME]"
+				<Panel Margin="10,0,20,0" Grid.Column="1" Grid.Row="1">
+					<ExperimentalAcrylicBorder IsHitTestVisible="False">
+						<ExperimentalAcrylicBorder.Material>
+							<ExperimentalAcrylicMaterial
+								BackgroundSource="Digger"
+								TintColor="Black"
+								TintOpacity="0.65"
+								MaterialOpacity="0.65" />
+						</ExperimentalAcrylicBorder.Material>
+					</ExperimentalAcrylicBorder>
+					<StackPanel VerticalAlignment="Center"
+								Name="DestinationCloudProviderPanel"
+								Grid.Column="0"
+								Grid.Row="0"
+								IsVisible="{Binding !DestinationCloudChosen}"
+								ClipToBounds="True">
+						<Image Width="90" Margin="33" Source="{StaticResource CloudDownload}" />
+						<Label Content="Destination Cloud Provider"
+							   HorizontalContentAlignment="Center"
+							   FontWeight="SemiBold"
+							   FontSize="20"/>
+						<ListBox Margin="20"
+								 Height="100">
+							<ListBoxItem Content="Teste 1"></ListBoxItem>
+						</ListBox>
+						<Button Margin="20,0,20,20"
+								HorizontalAlignment="Center">
+							<Button.Content>
+								<StackPanel Orientation="Horizontal">
+									<Label Content="Select Cloud Provider" />
+									<Image Width="20" Source="{StaticResource ArrowRight}" />
+								</StackPanel>
+							</Button.Content>
+						</Button>
+					</StackPanel>
+					<StackPanel VerticalAlignment="Center"
+								Name="DestinationProviderPrompt"
+								Grid.Column="0"
+								Grid.Row="0"
+								IsVisible="{Binding DestinationCloudChosen}"
+								ClipToBounds="True">
+						<Image Width="90" Margin="40" Source="{StaticResource CloudDownload}" />
+						<Label Content="[CLOUD PROVIDER NAME]"
+							   HorizontalContentAlignment="Center"
+							   FontWeight="SemiBold"
+							   FontSize="20"/>
+						<Label Content="Logged in as:"
+							   HorizontalContentAlignment="Center"/>
+						<Label Content="[text@example.com]"
+							   HorizontalContentAlignment="Center"/>
+						<Button Margin="20"
+								HorizontalAlignment="Center">
+							<Button.Content>
+								<StackPanel Orientation="Horizontal">
+									<Image Width="20" Source="{StaticResource RefreshIcon}" />
+									<Label Content="Change Cloud Provider" />
+								</StackPanel>
+							</Button.Content>
+						</Button>
+					</StackPanel>
+				</Panel>
+				<Button Grid.Column="0" 
+						Grid.ColumnSpan="2" 
+						Grid.Row="2" 
+						HorizontalAlignment="Center"
+						Margin="10"
+						Click="StartMigration">
+					<Button.Content>
+						<StackPanel>
+							<Image MaxWidth="40"
+								   Margin="10"
+								   HorizontalAlignment="Center"
+								   Source="{StaticResource CloudDownload}" />
+							<Label Classes="wrap"
+								   HorizontalAlignment="Stretch">
+								<TextBlock TextAlignment="Center">Start Migration</TextBlock>
+							</Label>
+						</StackPanel>
+					</Button.Content>
+				</Button>
+			</Grid>
+			<Panel Background="#9A000000" 
+				   IsVisible="{Binding IsMigrating}"
+				   ScrollViewer.VerticalScrollBarVisibility="Auto">
+				<StackPanel Margin="100,0,100,0"
+							MaxWidth="600"
+							Background="#EF3A3A3A"
+							ClipToBounds="True"
+							VerticalAlignment="Center">
+					<Image Width="90" Margin="20" Source="{StaticResource DefaultCloud}" />
+					<Label Content="Migrating the files from one cloud to another..."
 						   HorizontalContentAlignment="Center"
 						   FontWeight="SemiBold"
 						   FontSize="20"/>
-					<Label Content="Logged in as:"
-						   HorizontalContentAlignment="Center"/>
-					<Label Content="[text@example.com]"
-						   HorizontalContentAlignment="Center"/>
-					<Button Margin="20" HorizontalAlignment="Center" Content="Change Destination Cloud Provider" />
+					<ProgressBar Margin="20,10,20,20" 
+								 Height="30" 
+								 ShowProgressText="True"
+								 Value="{Binding MigrationProgress}">
+					</ProgressBar>
+					<ListBox HorizontalAlignment="Stretch" Height="150">
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<Grid ColumnDefinitions="30,60*,40*" 
+									  ClipToBounds="True">
+									<Image Grid.Column="0" 
+										   HorizontalAlignment="Left" 
+										   VerticalAlignment="Center" 
+										   Width="20" 
+										   IsVisible="{Binding !IsDirectory}"
+										   Source="{StaticResource FileIcon}"></Image>
+									<Image Grid.Column="0"
+										   HorizontalAlignment="Left"
+										   VerticalAlignment="Center"
+										   Width="20"
+										   IsVisible="{Binding IsDirectory}"
+										   Source="{StaticResource DirectoryIcon}"></Image>
+									<Label Grid.Column="1" Grid.Row="0" 
+										   VerticalAlignment="Center" 
+										   Content="{Binding FileName}"></Label>
+									<ProgressBar Grid.Column="2" 
+												 Grid.Row="0" 
+												 Height="25" 
+												 VerticalAlignment="Center" 
+												 ShowProgressText="True"
+												 Value="{Binding FileProgress}"></ProgressBar>
+								</Grid>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+					<Button Margin="15" HorizontalAlignment="Center" Content="Stop the Operation" Click="CancelMigration"/>
 				</StackPanel>
-			</Grid>
+			</Panel>
 		</Panel>
 	</Panel>
 </Window>
