@@ -9,7 +9,7 @@ namespace CloudMigrationTool.Core.DataModels
         /// <summary>
         /// Contains the logos for this cloud provider
         /// </summary>
-        public LogoInfo Logos { get; private set; }
+        public abstract LogoInfo Logos { get; }
 
         /// <summary>
         /// Contains the name of the provider of the cloud

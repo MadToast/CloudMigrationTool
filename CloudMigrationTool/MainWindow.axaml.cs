@@ -19,6 +19,7 @@ public partial class MainWindow : Window
         MigrationProgress = 0;
         DataContext = this;
     }
+
     private void StartMigration(object sender, RoutedEventArgs e)
     {
         IsMigrating = true;
