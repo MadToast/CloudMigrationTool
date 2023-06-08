@@ -14,21 +14,21 @@ namespace CloudMigrationTool.Core.DataModels
         /// <summary>
         /// Contains the name of the provider of the cloud
         /// </summary>
-        public string ProviderName { get; private set; }
+        public abstract string ProviderName { get; }
 
         /// <summary>
         /// Contains the Total Space of the Cloud drive in bytes
         /// </summary>
-        public long TotalSize { get; private set; }
+        public long TotalSize { get; protected set; }
 
         /// <summary>
         /// Contains the Used Space of the Cloud drive in bytes
         /// </summary>
-        public long UsedSize { get; private set; }
+        public long UsedSize { get; protected set; }
 
         /// <summary>
         /// Contains the Remaining Available Space of the Cloud drive in bytes
         /// </summary>
-        public long RemainingSize { get; private set; }
+        public long RemainingSize { get; protected set; }
     }
 }

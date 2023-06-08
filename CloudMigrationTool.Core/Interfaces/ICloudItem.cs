@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CloudMigrationTool.Core.Interfaces
 {
@@ -54,7 +55,7 @@ namespace CloudMigrationTool.Core.Interfaces
         /// Sets the attributes for this Cloud item.
         /// </summary>
         /// <param name="attributes"></param>
-        bool SetAttributes(IDictionary<string, object> attributes);
+        Task<bool> SetAttributes(IDictionary<string, object> attributes);
         #endregion
     }
 }

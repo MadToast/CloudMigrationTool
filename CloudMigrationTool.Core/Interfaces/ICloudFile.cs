@@ -18,7 +18,7 @@ namespace CloudMigrationTool.Core.Interfaces
         /// Creates the file in the cloud and returns a stream
         /// </summary>
         /// <param name="overwriteIfExists">Overwrites the file with an empty one if it exists</param>
-        Stream Create(bool overwriteIfExists);
+        Stream Upload(bool overwriteIfExists);
 
         /// <summary>
         /// Deletes the file

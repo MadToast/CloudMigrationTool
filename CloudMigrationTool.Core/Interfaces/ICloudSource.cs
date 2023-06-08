@@ -62,5 +62,11 @@ namespace CloudMigrationTool.Core.Interfaces
         /// </summary>
         /// <returns>A ICloudDirectory instance containing the information and methods to access the root directory</returns>
         Task<ICloudDirectory> GetRootDirectory();
+
+        /// <summary>
+        /// Creates a directory at the specified path
+        /// </summary>
+        /// <returns>A ICloudDirectory instance containing the information and methods to access the root directory</returns>
+        Task<ICloudDirectory> CreateDirectory();
     }
 }

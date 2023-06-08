@@ -13,6 +13,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Graph.Models;
 using System.IO;
+using CloudMigrationTool.Core.Extensions;
+using CloudMigrationSource.OneDrive.OneDriveItems;
 
 namespace CloudMigrationSource.OneDrive
 {
@@ -21,9 +23,13 @@ namespace CloudMigrationSource.OneDrive
         #region Properties
         public UserInfo LoggedInUserInfo => _authenticationToken?.UserInfo;
 
-        public CloudInfo CloudInfo => _userCloudInfo;
+        public CloudInfo CloudInfo => _oneDriveCloudInfo;
 
         public bool IsAuthenticated => _authenticationToken != null;
+        #endregion
+
+        #region Internal Only Properties
+        internal Drive UserDrive => _userDrive;
         #endregion
 
         #region Private Variables
@@ -33,7 +39,8 @@ namespace CloudMigrationSource.OneDrive
 
         private GraphServiceClient _graphServiceClient;
 
-        private OneDriveCloudInfo _userCloudInfo;
+        private OneDriveCloudInfo _oneDriveCloudInfo;
+        private Drive _userDrive;
         #endregion
 
         #region Constructors
@@ -43,6 +50,8 @@ namespace CloudMigrationSource.OneDrive
                 .WithAuthority(AzureCloudInstance.AzurePublic, "common")
                 .WithRedirectUri("http://localhost")
                 .Build();
+
+            _oneDriveCloudInfo = new OneDriveCloudInfo(-1, -1, -1);
         }
         #endregion
 
@@ -92,13 +101,16 @@ namespace CloudMigrationSource.OneDrive
                         }
                     }
                 }
-            } catch (Exception ex)
+
+                _oneDriveCloudInfo = await SetupOneDriveCloudInfoAsync();
+            }
+            catch (Exception ex)
             {
                 Debug.WriteLine($"Error: Graph call failed: {ex.Message}");
                 return false;
             }
 
-            _authenticationToken =  new AuthenticationToken
+            _authenticationToken = new AuthenticationToken
             {
                 ExpiresOn = result?.ExpiresOn ?? DateTimeOffset.MinValue,
                 Token = result?.AccessToken ?? "",
@@ -116,14 +128,32 @@ namespace CloudMigrationSource.OneDrive
             return true;
         }
 
-        public Task<bool> Logout()
+        public async Task<bool> Logout()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var accounts = await _identityClient.GetAccountsAsync();
+
+                foreach (var account in accounts)
+                {
+                    await _identityClient.RemoveAsync(account);
+                }
+
+                _authenticationToken = null;
+                _graphServiceClient = null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error: Logout call failed: {ex.Message}");
+                return false;
+            }
+
+            return true;
         }
 
-        public Task<ICloudDirectory> GetCloudDirectory(CloudItemParameters fileParameters)
+        public Task<ICloudDirectory> GetCloudDirectory(CloudItemParameters directoryParameters)
         {
-            throw new NotImplementedException();
+            var oneDrivePath = $"root:{directoryParameters.Path}"
         }
 
         public Task<SearchResults> SearchCloudDirectory(SearchParameters searchParameters)
@@ -140,9 +170,100 @@ namespace CloudMigrationSource.OneDrive
         {
             throw new NotImplementedException();
         }
+        public Task<ICloudDirectory> CreateDirectory()
+        {
+            if (IsAuthenticated && _graphServiceClient != null)
+            {
+                if (Exists)
+                {
+                    return true;
+                }
+
+                var driveItem = new DriveItem()
+                {
+                    Name = Name,
+                    Folder = new Folder
+                    {
+                    }
+                };
+
+                string parentId;
+
+                // Check if this is a folder at root
+                if (FullName.Count((x) => x.Equals("/")) == 1)
+                {
+                    var root = await graphServiceClient
+                        .Drives[oneDriveCloudSource.UserDrive.Id]
+                        .Root
+                        .GetAsync();
+
+                    parentId = root.Id;
+                }
+                else if (Parent == null)
+                {
+                    Parent = new OneDriveDirectory(oneDriveCloudSource, graphServiceClient);
+                    Parent.
+                }
+
+
+
+                if (Parent.Exists || !Parent.Exists && (await Parent.Create()))
+                {
+                    var oneDriveParent = (OneDriveDirectory)Parent;
+
+                    var result = graphServiceClient
+                        .Drives[oneDriveCloudSource.UserDrive.Id]
+                        .Items[oneDriveParent.Id]
+                        .Children
+                        .PostAsync(driveItem);
+                }
+            }
+        }
         #endregion
 
         #region Private Methods
+        private async Task<OneDriveCloudInfo> SetupOneDriveCloudInfoAsync()
+        {
+            ExceptionHelpers.ThrowIfNull(_authenticationToken, nameof(_authenticationToken));
+            ExceptionHelpers.ThrowIfNull(_graphServiceClient, nameof(_graphServiceClient));
+
+            _userDrive = await _graphServiceClient.Me.Drive.GetAsync();
+
+            return new OneDriveCloudInfo(
+                    totalSize: _userDrive.Quota.Total ?? -1, // -1 means Not provided
+                    usedSize: _userDrive.Quota.Used ?? -1,
+                    remainingSize: _userDrive.Quota.Remaining ?? -1
+                );
+        }
+
+        private async Task<DriveItem> GetDriveItemIfExists(string pathToItem)
+        {
+            if (IsAuthenticated && _graphServiceClient != null)
+            {
+                try
+                {
+                    var driveItem = await _graphServiceClient
+                    .Drives[UserDrive.Id]
+                    .Root
+                    .ItemWithPath(pathToItem)
+                    .GetAsync();
+
+                    return driveItem;
+                } catch (ServiceException ex)
+                {
+                    if (ex.ResponseStatusCode == 404)
+                    {
+                        return null; // No file exists
+                    }
+
+                    //Throw the exception for anything else
+                    throw;
+                }
+            }
+
+            throw new InvalidOperationException("Attempted to get a Drive item without authentication.");
+        }
+
         #endregion
     }
 }
