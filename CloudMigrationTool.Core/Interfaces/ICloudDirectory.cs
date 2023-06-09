@@ -1,4 +1,5 @@
 ﻿
+using CloudMigrationTool.Core.DataModels;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -17,26 +18,14 @@ namespace CloudMigrationTool.Core.Interfaces
         /// <summary>
         /// Returns an enumerable with every child directory.
         /// </summary>
-        /// <returns>An <see cref="IEnumerable{ICloudDirectory}"/> that will enumerate every child directory found</returns>
-        Task<IEnumerable<ICloudDirectory>> EnumerateDirectories();
+        /// <returns>An <see cref="IEnumerable{CloudEnumeratedItem}"/> that will enumerate every child directory found</returns>
+        IAsyncEnumerable<CloudEnumeratedItem> EnumerateCloudItems();
 
         /// <summary>
         /// Returns an enumerable with every child directory that matches the string pattern.
         /// </summary>
-        /// <returns>An <see cref="IEnumerable{ICloudDirectory}"/> that will enumerate every child directory found that matches the string pattern.</returns>
-        Task<IEnumerable<ICloudDirectory>> EnumerateDirectories(string searchPattern, SearchOption searchOption);
-
-        /// <summary>
-        /// Returns an enumerable with every file within the directory.
-        /// </summary>
-        /// <returns>An <see cref="IEnumerable{ICloudFile}"/> that will enumerate every child directory found</returns>
-        Task<IEnumerable<ICloudFile>> EnumerateFiles();
-
-        /// <summary>
-        /// Returns an enumerable with every file within the directory that matches the string pattern.
-        /// </summary>
-        /// <returns>An <see cref="IEnumerable{ICloudFile}"/> that will enumerate every child directory found that matches the string pattern.</returns>
-        Task<IEnumerable<ICloudFile>> EnumerateFiles(string searchPattern, SearchOption searchOption);
+        /// <returns>An <see cref="IEnumerable{CloudEnumeratedItem}"/> that will enumerate every child directory found that matches the string pattern.</returns>
+        IAsyncEnumerable<CloudEnumeratedItem> EnumerateCloudItems(string searchPattern);
         #endregion
     }
 }

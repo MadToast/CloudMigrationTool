@@ -18,6 +18,7 @@ using CloudMigrationSource.OneDrive.OneDriveItems;
 using Microsoft.Graph.Core.Requests;
 using CloudMigrationTool.Core.Exceptions;
 using Microsoft.Graph.Drives.Item.Items.Item.CreateUploadSession;
+using Microsoft.Graph.Drives.Item.Items.Item.SearchWithQ;
 
 namespace CloudMigrationSource.OneDrive
 {
@@ -39,7 +40,7 @@ namespace CloudMigrationSource.OneDrive
         private GraphServiceClient _graphServiceClient;
 
         private CloudInfo _oneDriveCloudInfo;
-        private string _rootId;
+        private DriveItem _rootDirectory;
         #endregion
 
         #region Constructors
@@ -193,14 +194,11 @@ namespace CloudMigrationSource.OneDrive
             return new OneDriveFile(driveItem, this);
         }
 
-        public override async Task<ICloudDirectory> GetRootDirectory()
+        public override Task<ICloudDirectory> GetRootDirectory()
         {
             CheckAuthenticationStatus();
 
-            return new OneDriveDirectory(await _graphServiceClient
-                .Drives[_oneDriveCloudInfo.Id]
-                .Items[_rootId]
-                .GetAsync(), this);
+            return Task.FromResult((ICloudDirectory) new OneDriveDirectory(_rootDirectory, this));
         }
 
         public override async Task<ICloudDirectory> CreateDirectory(string path)
@@ -229,7 +227,7 @@ namespace CloudMigrationSource.OneDrive
                 // Create at root
                 directoryItem = await _graphServiceClient
                     .Drives[_oneDriveCloudInfo.Id]
-                    .Items[_rootId]
+                    .Items[_rootDirectory.Id]
                     .Children
                     .PostAsync(new DriveItem()
                     {
@@ -279,7 +277,7 @@ namespace CloudMigrationSource.OneDrive
 
             var uploadSession = await _graphServiceClient
                 .Drives[_oneDriveCloudInfo.Id]
-                .Items[_rootId]
+                .Items[_rootDirectory.Id]
                 .CreateUploadSession
                 .PostAsync(uploadSessionRequestBody);
 
@@ -334,16 +332,70 @@ namespace CloudMigrationSource.OneDrive
                 .Items[fileItem.Id]
                 .Content.GetAsync();
         }
+
+        public async IAsyncEnumerable<DriveItem> EnumerateDriveItems(DriveItem directoryItem, string searchPattern)
+        {
+            var directoryChildren = await _graphServiceClient
+                    .Drives[_oneDriveCloudInfo.Id]
+                    .Items[directoryItem.Id]
+                    .SearchWithQ(searchPattern)
+                    .GetAsync();
+            
+            await foreach(var item in IterateThroughResponse<DriveItem, SearchWithQResponse>(directoryChildren))
+            {
+                yield return item;
+            }
+        }
+        public async IAsyncEnumerable<DriveItem> EnumerateDriveItems(DriveItem directoryItem)
+        {
+            var directoryChildren = await _graphServiceClient
+                    .Drives[_oneDriveCloudInfo.Id]
+                    .Items[directoryItem.Id]
+                    .Children
+                    .GetAsync();
+
+            await foreach (var item in IterateThroughResponse<DriveItem, DriveItemCollectionResponse>(directoryChildren))
+            {
+                yield return item;
+            }
+        }
         #endregion
 
         #region Private Methods
+        private async IAsyncEnumerable<TReturn> IterateThroughResponse<TReturn, T>(T response)
+        {
+            var itemsIterated = new List<TReturn>();
+
+            var itemsIterator = PageIterator<TReturn, T>
+                .CreatePageIterator(
+                    _graphServiceClient,
+                    response,
+                    (iteratedItem) =>
+                    {
+                        itemsIterated.Add(iteratedItem);
+                        return true;
+                    });
+
+            await itemsIterator.IterateAsync();
+
+            while (itemsIterator.State != PagingState.Complete)
+            {
+                foreach (var iteratedItem in itemsIterated)
+                {
+                    yield return iteratedItem;
+                }
+
+                itemsIterated.Clear();
+                await itemsIterator.ResumeAsync();
+            }
+        }
         private async Task<CloudInfo> SetupOneDriveCloudInfoAsync()
         {
             ExceptionHelpers.ThrowIfNull(_authenticationToken, nameof(_authenticationToken));
             ExceptionHelpers.ThrowIfNull(_graphServiceClient, nameof(_graphServiceClient));
 
             var _userDrive = await _graphServiceClient.Me.Drive.GetAsync();
-            _rootId = _userDrive.Root.Id;
+            _rootDirectory = _userDrive.Root;
 
             return new CloudInfo(
                     id: _userDrive.Id,

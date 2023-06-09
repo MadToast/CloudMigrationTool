@@ -17,12 +17,12 @@ namespace CloudMigrationTool.Core.Interfaces
         /// <summary>
         /// Returns the Creation Time
         /// </summary>
-        DateTime CreationTime { get; }
+        DateTimeOffset? CreationDateTime { get; }
 
         /// <summary>
         /// Returns the Creation Time in UTC
         /// </summary>
-        DateTime CreationTimeUtc { get; }
+        DateTimeOffset? LastModifiedDateTime { get; }
 
         /// <summary>
         /// Returns the parent directory
@@ -43,11 +43,6 @@ namespace CloudMigrationTool.Core.Interfaces
         /// Returns the length of the item in bytes
         /// </summary>
         long Length { get; }
-
-        /// <summary>
-        /// Check if the item already exists
-        /// </summary>
-        bool Exists { get; }
         #endregion
 
         #region Methods
