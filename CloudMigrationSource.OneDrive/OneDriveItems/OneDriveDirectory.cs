@@ -31,21 +31,20 @@ namespace CloudMigrationSource.OneDrive.OneDriveItems
         public bool Exists => throw new NotImplementedException();
 
         #region private variables
-        private string Id;
-        private DriveItem directoryItem;
-        private GraphServiceClient graphServiceClient;
-        private OneDriveCloudSource oneDriveCloudSource;
+        private DriveItem _directoryItem;
+        private OneDriveCloudSource _cloudSource;
+        private GraphServiceClient _graphClient;
         #endregion
 
-        internal OneDriveDirectory(OneDriveCloudSource _oneDriveCloudSource, GraphServiceClient _graphServiceClient)
+        internal OneDriveDirectory(DriveItem directoryItem, OneDriveCloudSource cloudSource)
         {
-            this.oneDriveCloudSource = _oneDriveCloudSource;
-            this.graphServiceClient = _graphServiceClient;
+            _directoryItem = directoryItem;
+            _cloudSource = cloudSource;
         }
 
-        public Task<bool> Delete(bool withChildren, bool permanently)
+        public Task<ICloudDirectory> CreateChildDirectory(string directoryName)
         {
-            throw new NotImplementedException();
+            return _cloudSource.CreateDirectory($"{FullName}/{directoryName}");
         }
 
         public Task<IEnumerable<ICloudDirectory>> EnumerateDirectories()
@@ -53,17 +52,7 @@ namespace CloudMigrationSource.OneDrive.OneDriveItems
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ICloudDirectory>> EnumerateDirectories(string searchPattern, SearchOption searchOption)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<ICloudFile>> EnumerateFiles()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<ICloudFile>> EnumerateFiles(string searchPattern, SearchOption searchOption)
+        public Task<IEnumerable<ICloudFile>> EnumerateDirectories(string searchPattern, SearchOption searchOption)
         {
             throw new NotImplementedException();
         }

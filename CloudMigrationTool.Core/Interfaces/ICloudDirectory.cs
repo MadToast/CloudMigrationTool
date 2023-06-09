@@ -9,12 +9,10 @@ namespace CloudMigrationTool.Core.Interfaces
     {
         #region Methods
         /// <summary>
-        /// Deletes the directory.
+        /// Creates a child directory
         /// </summary>
-        /// <param name="withChildren">If true, will not fail if directory is empty.</param>
-        /// <param name="permanently">If true, will delete permanently. If false, will move the directory to the trash if supported. Fail if otherwise.</param>
-        /// <returns>True if the operation was successfull, False if not</returns>
-        Task<bool> Delete(bool withChildren, bool permanently);
+        /// <returns>The reference to the new directory</returns>
+        Task<ICloudDirectory> CreateChildDirectory(string directoryName);
 
         /// <summary>
         /// Returns an enumerable with every child directory.

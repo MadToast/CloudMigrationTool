@@ -4,17 +4,17 @@ using System.Text;
 
 namespace CloudMigrationTool.Core.DataModels
 {
-    public abstract class CloudInfo
+    public class CloudInfo
     {
         /// <summary>
-        /// Contains the logos for this cloud provider
+        /// Contains the Id of the root Cloud
         /// </summary>
-        public abstract LogoInfo Logos { get; }
+        public string Id { get; protected set; }
 
         /// <summary>
-        /// Contains the name of the provider of the cloud
+        /// Contains the Name of the Drive in case the Cloud Provider supports multiple drives.
         /// </summary>
-        public abstract string ProviderName { get; }
+        public string Name { get; protected set; }
 
         /// <summary>
         /// Contains the Total Space of the Cloud drive in bytes
@@ -30,5 +30,14 @@ namespace CloudMigrationTool.Core.DataModels
         /// Contains the Remaining Available Space of the Cloud drive in bytes
         /// </summary>
         public long RemainingSize { get; protected set; }
+
+        public CloudInfo(string id, string name, long totalSize, long remainingSize, long usedSize)
+        {
+            Id = id;
+            Name = Name;
+            TotalSize = totalSize;
+            RemainingSize = remainingSize;
+            UsedSize = usedSize;
+        }
     }
 }

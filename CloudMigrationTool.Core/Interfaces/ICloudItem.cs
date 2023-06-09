@@ -51,6 +51,7 @@ namespace CloudMigrationTool.Core.Interfaces
         #endregion
 
         #region Methods
+
         /// <summary>
         /// Sets the attributes for this Cloud item.
         /// </summary>

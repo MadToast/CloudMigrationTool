@@ -15,21 +15,20 @@ using Microsoft.Graph.Models;
 using System.IO;
 using CloudMigrationTool.Core.Extensions;
 using CloudMigrationSource.OneDrive.OneDriveItems;
+using Microsoft.Graph.Core.Requests;
+using CloudMigrationTool.Core.Exceptions;
+using Microsoft.Graph.Drives.Item.Items.Item.CreateUploadSession;
 
 namespace CloudMigrationSource.OneDrive
 {
-    public class OneDriveCloudSource : ICloudSource
+    public class OneDriveCloudSource : CloudSource
     {
         #region Properties
-        public UserInfo LoggedInUserInfo => _authenticationToken?.UserInfo;
+        public override UserInfo LoggedInUserInfo => _authenticationToken?.UserInfo;
 
-        public CloudInfo CloudInfo => _oneDriveCloudInfo;
+        public override CloudInfo CloudInfo => _oneDriveCloudInfo;
 
-        public bool IsAuthenticated => _authenticationToken != null;
-        #endregion
-
-        #region Internal Only Properties
-        internal Drive UserDrive => _userDrive;
+        public override bool IsAuthenticated => _authenticationToken != null;
         #endregion
 
         #region Private Variables
@@ -39,24 +38,22 @@ namespace CloudMigrationSource.OneDrive
 
         private GraphServiceClient _graphServiceClient;
 
-        private OneDriveCloudInfo _oneDriveCloudInfo;
-        private Drive _userDrive;
+        private CloudInfo _oneDriveCloudInfo;
+        private string _rootId;
         #endregion
 
         #region Constructors
-        public OneDriveCloudSource()
+        public OneDriveCloudSource(bool isConsoleMode) : base(isConsoleMode)
         {
             _identityClient = PublicClientApplicationBuilder.Create(Constants.ApplicationId)
                 .WithAuthority(AzureCloudInstance.AzurePublic, "common")
                 .WithRedirectUri("http://localhost")
                 .Build();
-
-            _oneDriveCloudInfo = new OneDriveCloudInfo(-1, -1, -1);
         }
         #endregion
 
         #region Public Methods
-        public async Task<bool> Authenticate()
+        public override async Task<bool> Authenticate()
         {
             var accounts = await _identityClient.GetAccountsAsync();
             AuthenticationResult result = null;
@@ -68,9 +65,22 @@ namespace CloudMigrationSource.OneDrive
             }
             catch (MsalUiRequiredException)
             {
-                result = await _identityClient
-                    .AcquireTokenInteractive(Constants.Scopes)
-                    .ExecuteAsync();
+                if (_isConsoleMode)
+                {
+                    result = await _identityClient
+                        .AcquireTokenWithDeviceCode(Constants.Scopes, (deviceCode) =>
+                        {
+                            Console.WriteLine(deviceCode.Message);
+                            return Task.FromResult(0);
+                        })
+                        .ExecuteAsync();
+                }
+                else
+                {
+                    result = await _identityClient
+                        .AcquireTokenInteractive(Constants.Scopes)
+                        .ExecuteAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -128,7 +138,7 @@ namespace CloudMigrationSource.OneDrive
             return true;
         }
 
-        public async Task<bool> Logout()
+        public override async Task<bool> Logout()
         {
             try
             {
@@ -151,117 +161,205 @@ namespace CloudMigrationSource.OneDrive
             return true;
         }
 
-        public Task<ICloudDirectory> GetCloudDirectory(CloudItemParameters directoryParameters)
+        public override async Task<ICloudDirectory> GetCloudDirectory(CloudItemParameters directoryParameters)
         {
-            var oneDrivePath = $"root:{directoryParameters.Path}"
+            CheckAuthenticationStatus();
+
+            var driveItem = await _graphServiceClient
+                .Drives[_oneDriveCloudInfo.Id]
+                .Root
+                .ItemWithPath(directoryParameters.Path)
+                .GetAsync();
+
+            if (driveItem.FileObject != null)
+                throw new DirectoryWasFileException();
+
+            return new OneDriveDirectory(driveItem, this);
         }
 
-        public Task<SearchResults> SearchCloudDirectory(SearchParameters searchParameters)
+        public override async Task<ICloudFile> GetCloudFile(CloudItemParameters fileParameters)
         {
-            throw new NotImplementedException();
+            CheckAuthenticationStatus();
+
+            var driveItem = await _graphServiceClient
+                .Drives[_oneDriveCloudInfo.Id]
+                .Root
+                .ItemWithPath(fileParameters.Path)
+                .GetAsync();
+
+            if (driveItem.Folder != null)
+                throw new FileWasDirectoryException();
+
+            return new OneDriveFile(driveItem, this);
         }
 
-        public Task<ICloudFile> GetCloudFile(CloudItemParameters fileParameters)
+        public override async Task<ICloudDirectory> GetRootDirectory()
         {
-            throw new NotImplementedException();
+            CheckAuthenticationStatus();
+
+            return new OneDriveDirectory(await _graphServiceClient
+                .Drives[_oneDriveCloudInfo.Id]
+                .Items[_rootId]
+                .GetAsync(), this);
         }
 
-        public Task<ICloudDirectory> GetRootDirectory()
+        public override async Task<ICloudDirectory> CreateDirectory(string path)
         {
-            throw new NotImplementedException();
-        }
-        public Task<ICloudDirectory> CreateDirectory()
-        {
-            if (IsAuthenticated && _graphServiceClient != null)
+            CheckAuthenticationStatus();
+
+            //Initialize a sanitized path
+            var sanitizedPath = path;
+
+            // Remove initial slash
+            if (path.StartsWith("/"))
+                sanitizedPath = path.Substring(1);
+
+            if (sanitizedPath.EndsWith("/"))
+                sanitizedPath = sanitizedPath.Substring(0, sanitizedPath.Length - 1);
+
+            // Sanity check
+            if (string.IsNullOrWhiteSpace(sanitizedPath))
+                throw new InvalidOperationException("Path cannot be empty!");
+
+            var slashLastIndex = sanitizedPath.LastIndexOf("/");
+
+            DriveItem directoryItem;
+            if (slashLastIndex == -1)
             {
-                if (Exists)
-                {
-                    return true;
-                }
-
-                var driveItem = new DriveItem()
-                {
-                    Name = Name,
-                    Folder = new Folder
+                // Create at root
+                directoryItem = await _graphServiceClient
+                    .Drives[_oneDriveCloudInfo.Id]
+                    .Items[_rootId]
+                    .Children
+                    .PostAsync(new DriveItem()
                     {
-                    }
+                        Name = sanitizedPath
+                    });
+            }
+            else
+            {
+                var parent = sanitizedPath.Substring(0, slashLastIndex);
+                var folderName = sanitizedPath.Substring(slashLastIndex + 1);
+                directoryItem = await _graphServiceClient
+                    .Drives[_oneDriveCloudInfo.Id]
+                    .Root
+                    .ItemWithPath($"/{parent}")
+                    .Children
+                    .PostAsync(new DriveItem()
+                    {
+                        Name = folderName
+                    });
+            }
+
+            return new OneDriveDirectory(directoryItem, this);
+        }
+
+        public override async Task<ICloudFile> UploadFile(ICloudDirectory destination, ICloudFile file, bool overwriteIfExists = false, IProgress<long> progressCallback = null)
+        {
+            CheckAuthenticationStatus();
+
+            // Use properties to specify the conflict behavior
+            // in this case, replace
+            var uploadSessionRequestBody = new CreateUploadSessionPostRequestBody()
+            {
+                Item = new DriveItemUploadableProperties()
+                {
+                    FileSize = file.Length,
+                    Name = file.Name
+                }
+            };
+
+            if (overwriteIfExists)
+            {
+                uploadSessionRequestBody.Item.AdditionalData = new Dictionary<string, object>
+                {
+                    { "@microsoft.graph.conflictBehavior", "replace" }
                 };
+            };
 
-                string parentId;
+            var uploadSession = await _graphServiceClient
+                .Drives[_oneDriveCloudInfo.Id]
+                .Items[_rootId]
+                .CreateUploadSession
+                .PostAsync(uploadSessionRequestBody);
 
-                // Check if this is a folder at root
-                if (FullName.Count((x) => x.Equals("/")) == 1)
+            using (var inputStream = file.Open())
+            {
+                var fileUploadTask = new LargeFileUploadTask<DriveItem>(
+                    uploadSession: uploadSession,
+                    uploadStream: inputStream,
+                    requestAdapter: _graphServiceClient.RequestAdapter);
+
+                var totalLength = inputStream.Length;
+
+                // Create a callback that is invoked after each slice is uploaded
+                IProgress<long> progress = new Progress<long>(prog =>
                 {
-                    var root = await graphServiceClient
-                        .Drives[oneDriveCloudSource.UserDrive.Id]
-                        .Root
-                        .GetAsync();
+                    Console.WriteLine($"Uploaded {prog} bytes of {totalLength} bytes");
 
-                    parentId = root.Id;
+                    if (progressCallback != null)
+                    {
+                        progressCallback?.Report(prog);
+                    }
+                });
+
+                try
+                {
+                    // Upload the file
+                    var uploadResult = await fileUploadTask.UploadAsync(progress);
+
+                    Console.WriteLine(uploadResult.UploadSucceeded ?
+                        $"Upload complete, item ID: {uploadResult.ItemResponse.Id}" :
+                        "Upload failed");
+
+                    return new OneDriveFile(uploadResult.ItemResponse, this);
                 }
-                else if (Parent == null)
+                catch (ServiceException ex)
                 {
-                    Parent = new OneDriveDirectory(oneDriveCloudSource, graphServiceClient);
-                    Parent.
-                }
-
-
-
-                if (Parent.Exists || !Parent.Exists && (await Parent.Create()))
-                {
-                    var oneDriveParent = (OneDriveDirectory)Parent;
-
-                    var result = graphServiceClient
-                        .Drives[oneDriveCloudSource.UserDrive.Id]
-                        .Items[oneDriveParent.Id]
-                        .Children
-                        .PostAsync(driveItem);
+                    Console.WriteLine($"Error uploading: {ex.ToString()}");
+                    throw;
                 }
             }
+        }
+        
+        public async Task<Stream> OpenFileStream(DriveItem fileItem)
+        {
+            CheckAuthenticationStatus();
+
+            if (fileItem.FileObject == null)
+                throw new FileWasDirectoryException();
+
+            return await _graphServiceClient
+                .Drives[_oneDriveCloudInfo.Id]
+                .Items[fileItem.Id]
+                .Content.GetAsync();
         }
         #endregion
 
         #region Private Methods
-        private async Task<OneDriveCloudInfo> SetupOneDriveCloudInfoAsync()
+        private async Task<CloudInfo> SetupOneDriveCloudInfoAsync()
         {
             ExceptionHelpers.ThrowIfNull(_authenticationToken, nameof(_authenticationToken));
             ExceptionHelpers.ThrowIfNull(_graphServiceClient, nameof(_graphServiceClient));
 
-            _userDrive = await _graphServiceClient.Me.Drive.GetAsync();
+            var _userDrive = await _graphServiceClient.Me.Drive.GetAsync();
+            _rootId = _userDrive.Root.Id;
 
-            return new OneDriveCloudInfo(
+            return new CloudInfo(
+                    id: _userDrive.Id,
+                    name: _userDrive.DriveType,
                     totalSize: _userDrive.Quota.Total ?? -1, // -1 means Not provided
                     usedSize: _userDrive.Quota.Used ?? -1,
                     remainingSize: _userDrive.Quota.Remaining ?? -1
                 );
         }
 
-        private async Task<DriveItem> GetDriveItemIfExists(string pathToItem)
+        private void CheckAuthenticationStatus()
         {
-            if (IsAuthenticated && _graphServiceClient != null)
+            if (!IsAuthenticated)
             {
-                try
-                {
-                    var driveItem = await _graphServiceClient
-                    .Drives[UserDrive.Id]
-                    .Root
-                    .ItemWithPath(pathToItem)
-                    .GetAsync();
-
-                    return driveItem;
-                } catch (ServiceException ex)
-                {
-                    if (ex.ResponseStatusCode == 404)
-                    {
-                        return null; // No file exists
-                    }
-
-                    //Throw the exception for anything else
-                    throw;
-                }
+                throw new CloudSourceNotAuthenticatedException("User has not authenticated yet!");
             }
-
-            throw new InvalidOperationException("Attempted to get a Drive item without authentication.");
         }
 
         #endregion

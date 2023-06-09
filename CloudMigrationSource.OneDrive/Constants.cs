@@ -6,14 +6,16 @@ namespace CloudMigrationSource.OneDrive
 {
     internal static class Constants
     {
-        public static string ApplicationId = "23b92609-1d31-4990-8fc5-d74151d34776";
+        internal static string ApplicationId = "23b92609-1d31-4990-8fc5-d74151d34776";
 
-        public static string[] Scopes =
+        internal static string PathPrefix = "/drive/root:";
+
+        internal static string[] Scopes =
         {
             "https://graph.microsoft.com/.default"
         };
 
-        public static string[] AllowedImageTypes =
+        internal static string[] AllowedImageTypes =
         {
             "image/jpg",
             "image/jpeg",
@@ -22,7 +24,7 @@ namespace CloudMigrationSource.OneDrive
             "image/tiff"
         };
 
-        public static IReadOnlyDictionary<string, string> ImageTypeExtensionMappping = new Dictionary<string, string>()
+        internal static IReadOnlyDictionary<string, string> ImageTypeExtensionMappping = new Dictionary<string, string>()
         {
             { "image/jpg", ".jpg" },
             { "image/jpeg", ".jpg" },
