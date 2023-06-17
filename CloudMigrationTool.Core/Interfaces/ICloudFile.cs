@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace CloudMigrationTool.Core.Interfaces
 {
@@ -23,7 +24,7 @@ namespace CloudMigrationTool.Core.Interfaces
         /// <summary>
         /// Opens a FileStream with the specified mode
         /// </summary>
-        Stream Open();
+        Task<Stream> Open();
         #endregion
     }
 }

@@ -12,7 +12,7 @@ namespace CloudMigrationTool.Core.DataModels
         public string Id { get; protected set; }
 
         /// <summary>
-        /// Contains the Name of the Drive in case the Cloud Provider supports multiple drives.
+        /// Contains the Name of the Drive or Cloud Provider
         /// </summary>
         public string Name { get; protected set; }
 

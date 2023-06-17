@@ -1,6 +1,8 @@
 ﻿using Azure.Core;
+using CloudMigrationTool.Core;
 using CloudMigrationTool.Core.DataModels;
 using CloudMigrationTool.Core.Interfaces;
+using CloudMigrationTool.Core.SearchObjects;
 using Microsoft.Graph;
 using Microsoft.Graph.Drives.Item.Items.Item.CreateUploadSession;
 using Microsoft.Graph.Models;
@@ -10,41 +12,36 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CoreConstants = CloudMigrationTool.Core.Constants;
 
 namespace CloudMigrationSource.OneDrive.OneDriveItems
 {
     internal class OneDriveDirectory : ICloudDirectory
     {
-        public IDictionary<string, object> Attributes => throw new NotSupportedException();
+        public IReadOnlyDictionary<string, object> Attributes => new Dictionary<string, object>();
 
-        public DateTimeOffset CreationDateTime => _directoryItem.CreatedDateTime.Value;
+        public DateTimeOffset? CreationDateTime => _directoryItem.CreatedDateTime.Value;
 
-        public DateTimeOffset LastModifiedDateTime => _directoryItem.LastModifiedDateTime.HasValue ? 
+        public DateTimeOffset? LastModifiedDateTime => _directoryItem.LastModifiedDateTime.HasValue ? 
             _directoryItem.LastModifiedDateTime.Value :
             _directoryItem.CreatedDateTime.Value;
 
-        public ICloudDirectory Parent => _parent;
+        public string FullName => $"{_directoryItem.ParentReference.Path?.Substring(Constants.PathPrefix.Length) ?? "/"}{_directoryItem.Name}";
 
-        public string FullName => throw new NotImplementedException();
+        public string Name => _directoryItem.Name;
 
-        public string Name => throw new NotImplementedException();
-
-        public long Length => throw new NotImplementedException();
-
-        public bool Exists => throw new NotImplementedException();
+        public long Length => _directoryItem.Size ?? CoreConstants.UndeterminedLength;
 
         #region private variables
+        private OneDriveCloudSource _cloudSource;
         private DriveItem _directoryItem;
         private OneDriveDirectory _parent;
-        private OneDriveCloudSource _cloudSource;
-        private GraphServiceClient _graphClient;
         #endregion
 
-        internal OneDriveDirectory(DriveItem directoryItem, DriveItem parentItem, OneDriveCloudSource cloudSource)
+        internal OneDriveDirectory(DriveItem directoryItem, OneDriveCloudSource cloudSource)
         {
             _directoryItem = directoryItem;
             _cloudSource = cloudSource;
-            _parentItem = parentItem;
         }
 
         public Task<ICloudDirectory> CreateChildDirectory(string directoryName)
@@ -83,6 +80,21 @@ namespace CloudMigrationSource.OneDrive.OneDriveItems
         public Task<bool> SetAttributes(IDictionary<string, object> attributes)
         {
             throw new NotSupportedException();
+        }
+
+        public async Task<ICloudDirectory> GetParent()
+        {
+            if (_parent == null && !string.IsNullOrWhiteSpace(_directoryItem.ParentReference.Id))
+            {
+                var parentItem = await _cloudSource.GetDriveItemAsync(new CloudItemParameters()
+                {
+                    ID = _directoryItem.ParentReference.Id,
+                });
+
+                _parent = new OneDriveDirectory(parentItem, _cloudSource);
+            }
+
+            return _parent;
         }
     }
 }

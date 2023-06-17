@@ -4,16 +4,34 @@ using System.Text;
 
 namespace CloudMigrationTool.Core.DataModels
 {
-    public class LogoInfo
+    public abstract class LogoInfo
     {
         /// <summary>
-        /// Contains the light logo binary data to display in the app
+        /// Contains the light logo data to display in the app
+        /// 
+        /// If null, it means the cloud source does not have logo content
         /// </summary>
-        string LightPhotoFile { get; set; }
+        public abstract byte[] LightPhotoContent();
 
         /// <summary>
-        /// Contains the light logo binary data to display in the app
+        /// Contains the light logo svg content to display in the app
+        /// 
+        /// If null, it means the cloud source does not have svg logo content
         /// </summary>
-        string DarkPhotoFile { get; set; }
+        public abstract string LightPhotoSvgContent();
+
+        /// <summary>
+        /// Contains the dark logo binary data to display in the app
+        /// 
+        /// If null, it means the cloud source does not have logo content
+        /// </summary>
+        public abstract byte[] DarkPhotoContent();
+
+        /// <summary>
+        /// Contains the dark logo binary data to display in the app
+        /// 
+        /// If null, it means the cloud source does not have svg logo content
+        /// </summary>
+        public abstract string DarkPhotoSvgContent();
     }
 }

@@ -12,7 +12,7 @@ namespace CloudMigrationTool.Core.Interfaces
         /// <summary>
         /// Returns a dictionary of the attributes where the key is the attribute name and value is the value of the attribute
         /// </summary>
-        IDictionary<string, object> Attributes { get; }
+        IReadOnlyDictionary<string, object> Attributes { get; }
 
         /// <summary>
         /// Returns the Creation Time
@@ -23,11 +23,6 @@ namespace CloudMigrationTool.Core.Interfaces
         /// Returns the Creation Time in UTC
         /// </summary>
         DateTimeOffset? LastModifiedDateTime { get; }
-
-        /// <summary>
-        /// Returns the parent directory
-        /// </summary>
-        ICloudDirectory Parent { get; }
 
         /// <summary>
         /// Returns the full path of the item
@@ -52,6 +47,12 @@ namespace CloudMigrationTool.Core.Interfaces
         /// </summary>
         /// <param name="attributes"></param>
         Task<bool> SetAttributes(IDictionary<string, object> attributes);
+
+        /// <summary>
+        /// Gets the parent of this Cloud item
+        /// </summary>
+        /// <returns></returns>
+        Task<ICloudDirectory> GetParent();
         #endregion
     }
 }

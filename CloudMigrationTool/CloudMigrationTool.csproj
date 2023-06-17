@@ -6,6 +6,12 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaXaml Remove="Assets\**" />
+    <Compile Remove="Assets\**" />
+    <EmbeddedResource Remove="Assets\**" />
+    <None Remove="Assets\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
@@ -21,27 +27,6 @@
     <PackageReference Include="Microsoft.Graph" Version="5.7.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.53.0" />
     <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Assets\Icons\DefaultCloud.svg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\GoogleDrive_Icon.svg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\OneDrive_Icon.svg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-	<Content Update="Assets\Icons\CloudDownload.svg">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Content>
-	<Content Update="Assets\Icons\CloudSynchronization.svg">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Content>
-	<Content Update="Assets\Icons\CloudUpload.svg">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Content>
   </ItemGroup>
 
   <ItemGroup>

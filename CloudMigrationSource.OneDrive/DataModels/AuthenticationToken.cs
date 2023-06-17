@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CloudMigrationSource.OneDrive
+namespace CloudMigrationSource.OneDrive.DataModels
 {
     internal class AuthenticationToken
     {
